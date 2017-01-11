@@ -1,0 +1,49 @@
+@font-face {
+    font-family: bebasnue;
+    src: url(../font/BebasNeue.otf);
+}
+
+h1{
+  padding: 10px;
+  font-family: bebasnue;
+  text-align:left;
+}
+
+h4{
+  padding-left: 10px;
+}
+
+p{
+  padding-left:10px;
+  font-family: arial;
+}
+
+span{
+  font-style: oblique;
+  color: #239e53;
+}
+
+.boldedText{
+  font-weight: bold;
+  font-style: normal;
+  color: black;
+  font-size: 16px;
+}
+
+code{
+    display: block;
+    padding: 5px;
+    color: black;
+    white-space: pre;
+    background-color: #f3ecec;
+}
+
+.container{
+  max-width: 960px;
+}
+
+.header-back{
+  background-color: yellow;
+  border-radius: 10px;
+  box-shadow: 3px 3px 3px #888888;
+}
