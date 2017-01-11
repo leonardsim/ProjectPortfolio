@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link href="css/stylesheet.css" rel="stylesheet">
+    <title>Leonard Sim's Portfolio</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="header-back">
+            <h1>Leonard Sim - Portfolio</h1>
+          </div>
+          <p>
+            The portfolio will contain my personal reflection on the project that Declan and I have been working on throghout this year.
+            We have been working in the Assistive-Tech group and collaborated together to do the Sound-Switch project.
+          </p>
+
+          <p>
+            I will also include several code snippets which I have found quite interesting
+            while working on the recording side of the project.
+          </p>
+          <p>Our Sound-Switch project can be found <a href="https://github.com/OtagoPolytechnic/SoundSwitch">here</a></p>
+
+          <p></p>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="header-back">
+            <h1>Personal Reflection</h1>
+          </div>
+          <p>
+            I would like to begin this by saying that working on this project was a pleasure and I have garnered a great deal of experience through
+            learning how to use different tools, libraries and learning/working with a different language (Python), as well as, learning how the AGILE
+            methodology (SCRUM meeting and such) was put to practical use. To start, when we first got assigned to do the Sound-Switch, both Declan and I
+            had no prior knowledge on how to work with audio in programming. Our very first task was to find a library
+            that could compare audio samples which then returns an accuracy of the audio comparison to see how similar they were; this proved to be quite
+            challenging for us.
+          </p>
+          <p>
+            Finding libraries wasn't the problem, but getting it to work was. Declan and I took turns in trying to get several libraries to run on our seperate systems
+            ,but always ended up failing, due to dependency issues. This has caused us to be greatly demoralized and put off by the project initially, because
+            every time we fixed a problem with the dependency issues, several more came and it felt like we were hitting against a wall everytime
+            after breaking through. In the end, we managed to get a library (<a href="https://github.com/openpreserve/scape-xcorrsound">XcorrSound</a>)
+            to work on a Linux OS. From here, we were split in tasks - Declan worked on the porting of the XcorrSound library to Windows OS, while I was tasked
+            to build a recording/listening program.
+          </p>
+          <p>
+            In short, I was able to build a recording program in Python, but had to scrap it later, because it wouldn't play well with Declan's
+            GUI which was done in C#. So I had to start from scratch and build a recording program in C#. Basically, I needed to have the mic listen to the background noise and if there is a sound that exceeds a certain pre-set threshold
+            then it would start recording for a few seconds, but due to the lack of existing ones that will do this specific type of recording, I had to build my own.
+            The process of building this was frustrating as I was unfamiliar with working with the (<a href="https://naudio.codeplex.com/">NAudio library</a>), which was core
+            for recording, but in the end it was extemely rewarding when it was working as intended.
+          </p>
+          <p>
+            From here, we were able to speed things up significantly and both of us were able to deliver a working prototype by the end. Both Declan and I spent the
+            rest of the semester polishing up the program. In conclusion, what started slow and unmotivating, turned out to be quite enjoyable and very educational.
+            Declan and I have worked really hard in getting the Sound-Switch to work. If I had one thing  I could do differently, is that I would've wished I tried to put more
+            time into this project during the first semester
+          </p>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="header-back">
+            <h1>Interesting Code Snippets</h1>
+          </div>
+          <h4>Microphone Listening Feature</h3>
+          <p>
+            The code below shows how I've implemented the listening and recording feature for the program. Basically, the microphone will pick up noises and
+            my method will calculate the Root-Mean Square of the sound level and display it. Because this sourceListening_DataAvailable method is an Event Delegate
+            type that will be added to the Wave In Event Handler. Since it is constantly checking the microphone feed, I had to implement a recordedFlag property
+            so that it will only write to a wav file once the recordedFlag property is set to true and this only happens when the microphone detects a sound that exceeds
+            a pre-set threshold by the user. Once it cycles to the next event, the flag will now be true and will start writing the sound to a wave file for 1 second.
+            After it has recorded for 1 second, the wavefile will be disposed; clearing the memory and finalizing the wave file.
+          </p>
+          <p>
+            I wouldn't have been able to get this part working properly if I didn't request for help in the NAudio forum. Inititally, my code did not have the flags there,
+            so it was just an if-else statement with the if condition being the threshold and the else being the write-to-wave method. This caused issues, as it
+            wouldn't properly record, since it only writes the first byte of the sound of that event cycle, and never drops to the else in the next cycle to record
+            for 1 second. Setting up the flags and splitting the threshold detection with the write-to-wave method eliminated that problem.
+          </p>
+          <p>
+            You can check the Recorder classes here: <a href="https://github.com/OtagoPolytechnic/SoundSwitch/blob/master/sound-switch/sound-switch/Recorder.cs">Recorder</a>
+            and <a href="https://github.com/OtagoPolytechnic/SoundSwitch/blob/master/sound-switch/sound-switch/RecorderManager.cs">RecorderManager</a>
+          </p>
+          <code>
+    private void sourceListening_DataAvailable(object sender, NAudio.Wave.WaveInEventArgs e, RichTextBox rtbSoundLevel)
+    {
+        <span>// Obtain RMS value</span>
+        double rms = rec.CalculateRMS(e);
+
+        <span>// Format the RMS to 2 decimal places</span>
+        string rmsFormatted = rec.FormatRMSOutput(rms);
+
+        <span>// Display the RMS in Rich Text Box</span>
+        rtbSoundLevel.AppendText(rmsFormatted + "\n");
+
+        <span>// If flag is false, check if the RMS exceeds the threshold</span>
+        if (rec.RecordedFlag == false)
+        {
+            if (rms > threshold)
+            {
+                <span>// Inititalise WaveWriter </span>
+                <span>// Enter file location and make sure the format saved is the same as the source stream</span>
+                rec.WaveWriter = new NAudio.Wave.WaveFileWriter(ProgramSettings.UnprocessedFileName, rec.SourceStream.WaveFormat);
+
+                <span>// Set flag to true</span>
+                rec.RecordedFlag = true;
+            }
+        }
+
+        <span>// If the flag is true, check to see if it is writing for</span>
+        if (rec.RecordedFlag == true)
+        {
+            <span>// Obtain the length of time in the wave file writer</span>
+            int seconds = rec.WaveWriterLengthOfTime();
+
+            <span>// If it is less than 1 second, then write data to the wave file writer</span>
+            if (seconds < 1)
+            {
+                rec.WriteToWaveWriter(e);
+            }
+            else <span>// Display message box and dispose ofthe wave file writer</span>
+            {
+                rec.WaveWriter.Dispose();
+
+                <span>// Set flag to false</span>
+                rec.RecordedFlag = false;
+
+                <span>// Alert our recorder manager that we have a file ready for sending.</span>
+                readyForProcessing = true;
+            }
+        }
+    }
+          </code>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
